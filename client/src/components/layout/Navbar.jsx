@@ -102,7 +102,7 @@ export default function Navbar({ onNavigate }) {
             </div>
 
             {/* Logout Action at Bottom */}
-            <div className="pt-6 border-t border-slate-100">
+            <div className="pt-6 border-t border-slate-100 space-y-4">
               <button
                 onClick={handleLogout}
                 className="flex items-center justify-center gap-2 w-full px-4 py-2 border border-red-200 rounded-lg text-xs font-semibold text-red-500 hover:bg-red-50 hover:text-red-600 transition duration-150 cursor-pointer"
@@ -110,6 +110,18 @@ export default function Navbar({ onNavigate }) {
                 <LogOut className="h-4 w-4" />
                 <span>Sign Out</span>
               </button>
+
+              <div className="text-[10px] text-slate-400 text-center pt-2 select-none border-t border-slate-100/50">
+                Designed &amp; Developed by{' '}
+                <a
+                  href="https://github.com/SurajSwarnkar1001"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-accent hover:text-accent-dark hover:underline transition"
+                >
+                  Suraj
+                </a>
+              </div>
             </div>
           </div>
         </div>

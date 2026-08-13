@@ -403,7 +403,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
                 value={editTagsInput}
                 onChange={(e) => setEditTagsInput(e.target.value)}
                 className="block w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-accent"
-                placeholder="comma-separated tags"
+                placeholder="tags (comma-separated, e.g. review, deploy)"
               />
             </div>
 

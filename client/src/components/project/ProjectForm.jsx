@@ -64,7 +64,7 @@ export default function ProjectForm({ project, onSubmit, onCancel, submitLabel =
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="block w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent sm:text-sm transition duration-150"
-          placeholder="e.g. My Side Business"
+          placeholder="e.g. Website Redesign"
         />
       </div>
 

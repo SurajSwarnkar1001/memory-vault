@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ShieldCheck, Loader2, Calendar, Mic, Sparkles } from 'lucide-react';
+import { ShieldCheck, Loader2, Calendar, Mic, Sparkles, Eye, EyeOff } from 'lucide-react';
 
 export default function SignupPage({ onNavigate }) {
   const { signup } = useAuth();
@@ -9,6 +9,7 @@ export default function SignupPage({ onNavigate }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,19 +36,19 @@ export default function SignupPage({ onNavigate }) {
 
   return (
     <div className="min-h-screen flex bg-bg-light select-none">
-
+      
       {/* Left side: Premium Animated Showcase Panel (hidden on mobile) */}
       <div className="hidden md:flex md:w-1/2 lg:w-3/5 bg-gradient-to-br from-slate-950 via-[#062412] to-accent p-12 text-white flex-col justify-between relative overflow-hidden">
         {/* Pulsing blurred background elements */}
         <div className="absolute top-[-10%] right-[-10%] h-80 w-80 rounded-full bg-accent/20 blur-3xl animate-pulse duration-4000" />
         <div className="absolute bottom-[-20%] left-[-10%] h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl animate-pulse duration-6000" />
-
+        
         {/* Header */}
         <div className="flex items-center gap-2 relative z-10 shrink-0">
           <div className="h-6 w-6 rounded bg-white/10 flex items-center justify-center text-white font-black text-xs border border-white/20">
             I
           </div>
-          <span className="text-[10px] font-bold tracking-widest uppercase text-white/80">memory vault</span>
+          <span className="text-[10px] font-bold tracking-widest uppercase text-white/80">izzki memory vault</span>
         </div>
 
         {/* Feature List */}
@@ -100,8 +101,16 @@ export default function SignupPage({ onNavigate }) {
         </div>
 
         {/* Footer */}
-        <div className="text-[9px] text-white/40 relative z-10 shrink-0">
-          © {new Date().getFullYear()} memory vault. All rights reserved.
+        <div className="text-[9px] text-white/40 relative z-10 shrink-0 select-none">
+          © {new Date().getFullYear()} memory vault. All rights reserved. | Designed &amp; Developed by{' '}
+          <a
+            href="https://github.com/SurajSwarnkar1001"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-accent-light hover:text-white transition"
+          >
+            Suraj
+          </a>
         </div>
       </div>
 
@@ -143,7 +152,7 @@ export default function SignupPage({ onNavigate }) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="block w-full rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-950 placeholder-slate-400 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition duration-150"
-                placeholder="John Doe"
+                placeholder="Enter your full name"
               />
             </div>
 
@@ -159,7 +168,7 @@ export default function SignupPage({ onNavigate }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="block w-full rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-955 placeholder-slate-400 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition duration-150"
-                placeholder="enter your email address"
+                placeholder="name@example.com"
               />
             </div>
 
@@ -167,16 +176,25 @@ export default function SignupPage({ onNavigate }) {
               <label htmlFor="password" className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                 Password
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="block w-full rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-955 placeholder-slate-400 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition duration-150"
-                placeholder="••••••••"
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="block w-full rounded-lg border border-slate-200 pl-3 pr-10 py-2 text-xs text-slate-955 placeholder-slate-400 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition duration-150"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             <div className="pt-2">
@@ -208,6 +226,19 @@ export default function SignupPage({ onNavigate }) {
                 Sign in instead
               </button>
             </p>
+            
+            {/* Mobile-only Developer Branding */}
+            <div className="mt-4 pt-3 border-t border-slate-50 text-[10px] text-slate-400 text-center md:hidden select-none">
+              Designed &amp; Developed by{' '}
+              <a
+                href="https://github.com/SurajSwarnkar1001"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-accent hover:text-accent-dark hover:underline transition"
+              >
+                Suraj
+              </a>
+            </div>
           </div>
         </div>
       </div>

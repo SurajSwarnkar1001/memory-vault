@@ -87,6 +87,18 @@ export default function Sidebar({ currentPath, onNavigate, onCreateProject }) {
             <LogOut className="h-3.5 w-3.5" />
             <span>Sign Out</span>
           </button>
+
+          <div className="text-[10px] text-slate-400 text-center pt-2 select-none border-t border-slate-100/50">
+            Designed &amp; Developed by{' '}
+            <a
+              href="https://github.com/SurajSwarnkar1001"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-accent hover:text-accent-dark hover:underline transition"
+            >
+              Suraj
+            </a>
+          </div>
         </div>
       )}
     </aside>
