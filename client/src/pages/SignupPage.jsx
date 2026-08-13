@@ -36,19 +36,19 @@ export default function SignupPage({ onNavigate }) {
 
   return (
     <div className="min-h-screen flex bg-bg-light select-none">
-      
+
       {/* Left side: Premium Animated Showcase Panel (hidden on mobile) */}
       <div className="hidden md:flex md:w-1/2 lg:w-3/5 bg-gradient-to-br from-slate-950 via-[#062412] to-accent p-12 text-white flex-col justify-between relative overflow-hidden">
         {/* Pulsing blurred background elements */}
         <div className="absolute top-[-10%] right-[-10%] h-80 w-80 rounded-full bg-accent/20 blur-3xl animate-pulse duration-4000" />
         <div className="absolute bottom-[-20%] left-[-10%] h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl animate-pulse duration-6000" />
-        
+
         {/* Header */}
         <div className="flex items-center gap-2 relative z-10 shrink-0">
           <div className="h-6 w-6 rounded bg-white/10 flex items-center justify-center text-white font-black text-xs border border-white/20">
             I
           </div>
-          <span className="text-[10px] font-bold tracking-widest uppercase text-white/80">izzki memory vault</span>
+          <span className="text-[10px] font-bold tracking-widest uppercase text-white/80"> memory vault</span>
         </div>
 
         {/* Feature List */}
@@ -226,7 +226,7 @@ export default function SignupPage({ onNavigate }) {
                 Sign in instead
               </button>
             </p>
-            
+
             {/* Mobile-only Developer Branding */}
             <div className="mt-4 pt-3 border-t border-slate-50 text-[10px] text-slate-400 text-center md:hidden select-none">
               Designed &amp; Developed by{' '}
