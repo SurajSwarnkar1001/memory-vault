@@ -159,7 +159,7 @@ export default function SignupPage({ onNavigate }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="block w-full rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-955 placeholder-slate-400 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition duration-150"
-                placeholder="you@izzkitechsolution.com"
+                placeholder="enter your email address"
               />
             </div>
 

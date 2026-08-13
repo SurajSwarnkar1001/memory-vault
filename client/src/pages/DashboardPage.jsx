@@ -59,15 +59,15 @@ export default function DashboardPage({ onNavigate }) {
 
         <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-10">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
+        <div className="flex items-center justify-between mb-8 gap-4">
+          <div className="min-w-0">
             <h1 className="text-xl font-bold text-slate-900 tracking-tight">Projects</h1>
-            <p className="text-xs text-slate-500 mt-1">Manage and track assets for your active workspaces.</p>
+            <p className="text-xs text-slate-500 mt-1 hidden sm:block">Manage and track assets for your active workspaces.</p>
           </div>
 
           <button
             onClick={handleOpenCreateModal}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-accent hover:bg-accent-dark text-white rounded-lg text-xs font-semibold shadow-xs transition duration-150 cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-3 py-2 bg-accent hover:bg-accent-dark text-white rounded-lg text-xs font-semibold shadow-xs transition duration-150 cursor-pointer shrink-0"
           >
             <Plus className="h-4 w-4" />
             <span>Add Project</span>
