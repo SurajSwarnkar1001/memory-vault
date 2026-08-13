@@ -111,7 +111,7 @@ export default function DashboardPage({ onNavigate }) {
               <ProjectCard
                 key={proj._id}
                 project={proj}
-                onClick={() => onNavigate(`#/project/${proj._id}`)}
+                onClick={() => onNavigate(`/project/${proj._id}`)}
                 onEdit={() => handleOpenEditModal(proj)}
                 onDelete={() => setProjectToDelete(proj)}
               />

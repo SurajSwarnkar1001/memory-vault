@@ -27,7 +27,7 @@ export default function SignupPage({ onNavigate }) {
     setLoading(false);
 
     if (result.success) {
-      onNavigate('#/dashboard');
+      onNavigate('/dashboard');
     } else {
       setError(result.message);
     }
@@ -202,7 +202,7 @@ export default function SignupPage({ onNavigate }) {
             <p className="text-xs text-slate-500">
               Already have an account?{' '}
               <button
-                onClick={() => onNavigate('#/login')}
+                onClick={() => onNavigate('/login')}
                 className="font-semibold text-accent hover:text-accent-dark transition duration-150 cursor-pointer"
               >
                 Sign in instead

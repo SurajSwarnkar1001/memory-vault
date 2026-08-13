@@ -9,12 +9,12 @@ export default function Navbar({ onNavigate }) {
   const handleLogout = async () => {
     setIsSidebarOpen(false);
     await logout();
-    onNavigate('#/login');
+    onNavigate('/login');
   };
 
   const handleDashboardClick = () => {
     setIsSidebarOpen(false);
-    onNavigate('#/dashboard');
+    onNavigate('/dashboard');
   };
 
   return (
@@ -22,7 +22,7 @@ export default function Navbar({ onNavigate }) {
       {/* Brand logo */}
       <div
         className="flex items-center gap-2.5 cursor-pointer"
-        onClick={() => onNavigate('#/dashboard')}
+        onClick={() => onNavigate('/dashboard')}
       >
         <div className="h-7 w-7 rounded-md bg-accent flex items-center justify-center text-white font-black text-sm shadow-xs">
           I

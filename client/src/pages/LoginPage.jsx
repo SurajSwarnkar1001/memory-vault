@@ -22,7 +22,7 @@ export default function LoginPage({ onNavigate }) {
     setLoading(false);
 
     if (result.success) {
-      onNavigate('#/dashboard');
+      onNavigate('/dashboard');
     } else {
       setError(result.message);
     }
@@ -183,7 +183,7 @@ export default function LoginPage({ onNavigate }) {
             <p className="text-xs text-slate-500">
               New to Vault?{' '}
               <button
-                onClick={() => onNavigate('#/signup')}
+                onClick={() => onNavigate('/signup')}
                 className="font-semibold text-accent hover:text-accent-dark transition duration-150 cursor-pointer"
               >
                 Create a corporate account

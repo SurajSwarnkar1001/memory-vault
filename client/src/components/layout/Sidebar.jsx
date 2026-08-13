@@ -7,7 +7,7 @@ export default function Sidebar({ currentPath, onNavigate, onCreateProject }) {
 
   const handleLogout = async () => {
     await logout();
-    onNavigate('#/login');
+    onNavigate('/login');
   };
 
   return (
@@ -16,7 +16,7 @@ export default function Sidebar({ currentPath, onNavigate, onCreateProject }) {
         {/* Logo and Brand */}
         <div
           className="flex items-center gap-2.5 cursor-pointer"
-          onClick={() => onNavigate('#/dashboard')}
+          onClick={() => onNavigate('/dashboard')}
         >
           <div className="h-7 w-7 rounded-md bg-accent flex items-center justify-center text-white font-black text-sm shadow-xs">
             I
@@ -34,11 +34,12 @@ export default function Sidebar({ currentPath, onNavigate, onCreateProject }) {
             </span>
             <div className="space-y-1">
               <button
-                onClick={() => onNavigate('#/dashboard')}
-                className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer ${currentPath === '#/dashboard' || !currentPath.startsWith('#/project/')
+                onClick={() => onNavigate('/dashboard')}
+                className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                  currentPath === '/dashboard' || !currentPath.startsWith('/project/')
                     ? 'bg-accent-light text-accent'
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                  }`}
+                }`}
               >
                 <Folder className="h-4 w-4" />
                 <span>All Projects</span>
