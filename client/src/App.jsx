@@ -8,31 +8,35 @@ import { Loader2 } from 'lucide-react';
 
 function AppContent() {
   const { user, loading } = useAuth();
-  const [path, setPath] = useState(window.location.hash || '#/dashboard');
+  
+  // Initialize path mapping '/' to '/dashboard'
+  const initialPath = window.location.pathname === '/' ? '/dashboard' : window.location.pathname;
+  const [path, setPath] = useState(initialPath);
 
-  // Track hash changes
+  // Track browser navigation popstate events (back/forward clicks)
   useEffect(() => {
-    const handleHashChange = () => {
-      setPath(window.location.hash || '#/dashboard');
+    const handlePopState = () => {
+      const currentPath = window.location.pathname === '/' ? '/dashboard' : window.location.pathname;
+      setPath(currentPath);
     };
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const navigate = (newHash) => {
-    window.location.hash = newHash;
-    setPath(newHash);
+  const navigate = (newPath) => {
+    window.history.pushState({}, '', newPath);
+    setPath(newPath);
   };
 
   // Redirect unauthenticated users or redirect authenticated users from login/signup
   useEffect(() => {
     if (loading) return;
 
-    const isAuthRoute = ['#/login', '#/signup'].includes(path);
+    const isAuthRoute = ['/login', '/signup'].includes(path);
     if (!user && !isAuthRoute) {
-      navigate('#/login');
+      navigate('/login');
     } else if (user && isAuthRoute) {
-      navigate('#/dashboard');
+      navigate('/dashboard');
     }
   }, [user, path, loading]);
 
@@ -45,10 +49,10 @@ function AppContent() {
     );
   }
 
-  // Parse path for dynamic routes like #/project/:id
+  // Parse path for dynamic routes like /project/:id
   const getProjectId = () => {
-    if (path.startsWith('#/project/')) {
-      return path.split('#/project/')[1];
+    if (path.startsWith('/project/')) {
+      return path.split('/project/')[1];
     }
     return null;
   };
@@ -57,7 +61,7 @@ function AppContent() {
 
   // Render correct pages
   if (!user) {
-    if (path === '#/signup') {
+    if (path === '/signup') {
       return <SignupPage onNavigate={navigate} />;
     }
     return <LoginPage onNavigate={navigate} />;

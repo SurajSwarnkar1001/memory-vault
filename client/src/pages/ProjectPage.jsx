@@ -153,7 +153,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
   return (
     <div className="min-h-screen bg-bg-light flex">
       {/* Desktop left sidebar */}
-      <Sidebar currentPath={`#/project/${projectId}`} onNavigate={onNavigate} />
+      <Sidebar currentPath={`/project/${projectId}`} onNavigate={onNavigate} />
 
       <div className="flex-1 flex flex-col min-h-screen overflow-y-auto">
         <Navbar onNavigate={onNavigate} />
@@ -163,7 +163,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => onNavigate('#/dashboard')}
+              onClick={() => onNavigate('/dashboard')}
               className="rounded-lg p-2 border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition duration-150 cursor-pointer shrink-0"
               title="Back to dashboard"
             >
@@ -403,7 +403,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
                 value={editTagsInput}
                 onChange={(e) => setEditTagsInput(e.target.value)}
                 className="block w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-accent"
-                placeholder="comma-separated tags"
+                placeholder="tags (comma-separated, e.g. review, deploy)"
               />
             </div>
 
