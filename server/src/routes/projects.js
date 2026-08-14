@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
     
     // Aggregation to fetch projects along with counts and last entry dates
     const projects = await Project.aggregate([
-      { $match: { userId: userIdObj } },
+      { $match: { $or: [{ userId: userIdObj }, { members: userIdObj }] } },
       {
         $lookup: {
           from: 'entries',
@@ -91,7 +91,10 @@ router.patch('/:id', async (req, res) => {
   try {
     const { name, description, color, archived } = req.body;
     
-    let project = await Project.findOne({ _id: req.params.id, userId: req.user.id });
+    let project = await Project.findOne({ 
+      _id: req.params.id, 
+      $or: [{ userId: req.user.id }, { members: req.user.id }] 
+    });
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }

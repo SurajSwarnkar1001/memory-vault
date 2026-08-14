@@ -10,6 +10,7 @@ import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.js';
 import projectRoutes from './routes/projects.js';
 import entryRoutes from './routes/entries.js';
+import inviteRoutes from './routes/invites.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,6 +44,7 @@ const authLimiter = rateLimit({
 
 // Route Mounts
 app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api/projects', inviteRoutes); // Must be before projectRoutes to avoid /:id shadowing
 app.use('/api/projects', projectRoutes);
 app.use('/api/projects', entryRoutes);
 app.use('/api', entryRoutes);

@@ -6,6 +6,8 @@ import Sidebar from '../components/layout/Sidebar';
 import EntryComposer from '../components/entry/EntryComposer';
 import EntryCard from '../components/entry/EntryCard';
 import Modal from '../components/ui/Modal';
+import InviteModal from '../components/project/InviteModal';
+import { useAuth } from '../context/AuthContext';
 import { groupEntriesByDate } from '../utils/dateGrouping';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -18,7 +20,8 @@ import {
   X, 
   Loader2, 
   Info,
-  SlidersHorizontal
+  SlidersHorizontal,
+  UserPlus
 } from 'lucide-react';
 
 const typeOptions = [
@@ -45,6 +48,8 @@ export default function ProjectPage({ projectId, onNavigate }) {
 
   const [project, setProject] = useState(null);
   const [projectLoading, setProjectLoading] = useState(true);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const { user } = useAuth();
 
   // Filter States
   const [search, setSearch] = useState('');
@@ -205,8 +210,20 @@ export default function ProjectPage({ projectId, onNavigate }) {
             )}
           </div>
 
-          {/* Quick Filter toggle */}
-          <button
+          <div className="flex items-center gap-2">
+            {/* Share button for Owners only */}
+            {project && user && (user.id === project.userId || user._id === project.userId) && (
+              <button
+                onClick={() => setIsInviteModalOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-2 bg-slate-800 text-white hover:bg-slate-700 rounded-lg text-xs font-semibold cursor-pointer transition"
+              >
+                <UserPlus className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Share</span>
+              </button>
+            )}
+
+            {/* Quick Filter toggle */}
+            <button
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center gap-1.5 px-3 py-2 border rounded-lg text-xs font-semibold cursor-pointer transition ${
               showFilters || hasActiveFilters
@@ -222,6 +239,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
               </span>
             )}
           </button>
+          </div>
         </div>
 
         {/* Filter Controls Panel */}
@@ -497,6 +515,18 @@ export default function ProjectPage({ projectId, onNavigate }) {
           </div>
         </div>
       </Modal>
+
+
+
+      {/* Invite Modal */}
+      {project && (
+        <InviteModal
+          isOpen={isInviteModalOpen}
+          onClose={() => setIsInviteModalOpen(false)}
+          projectId={project._id}
+          projectName={project.name}
+        />
+      )}
       </div>
     </div>
   );

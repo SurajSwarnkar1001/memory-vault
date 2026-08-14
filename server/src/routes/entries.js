@@ -23,13 +23,13 @@ router.get('/:id/entries', async (req, res) => {
     const userId = req.user.id;
 
     // Verify project belongs to user
-    const project = await Project.findOne({ _id: projectId, userId });
+    const project = await Project.findOne({ _id: projectId, $or: [{ userId }, { members: userId }] });
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
 
     // Build filter query
-    const filter = { projectId, userId };
+    const filter = { projectId };
 
     const { type, tag, from, to, search } = req.query;
 
@@ -89,7 +89,7 @@ router.post('/:id/entries', async (req, res) => {
     }
 
     // Verify project ownership
-    const project = await Project.findOne({ _id: projectId, userId });
+    const project = await Project.findOne({ _id: projectId, $or: [{ userId }, { members: userId }] });
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
@@ -125,7 +125,7 @@ router.post('/:id/entries/upload-url', async (req, res) => {
     }
 
     // Verify project ownership
-    const project = await Project.findOne({ _id: projectId, userId });
+    const project = await Project.findOne({ _id: projectId, $or: [{ userId }, { members: userId }] });
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
@@ -179,7 +179,7 @@ router.post('/:id/entries/confirm-upload', async (req, res) => {
     }
 
     // Verify project ownership
-    const project = await Project.findOne({ _id: projectId, userId });
+    const project = await Project.findOne({ _id: projectId, $or: [{ userId }, { members: userId }] });
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
@@ -214,9 +214,13 @@ router.get('/entries/:id/view-url', async (req, res) => {
     const entryId = req.params.id;
     const userId = req.user.id;
 
-    const entry = await Entry.findOne({ _id: entryId, userId });
+    const entry = await Entry.findById(entryId);
     if (!entry) {
       return res.status(404).json({ message: 'Entry not found' });
+    }
+    const project = await Project.findOne({ _id: entry.projectId, $or: [{ userId }, { members: userId }] });
+    if (!project) {
+      return res.status(403).json({ message: 'Not authorized for this entry' });
     }
 
     if (!entry.fileKey) {
@@ -239,9 +243,13 @@ router.patch('/entries/:id', async (req, res) => {
     const userId = req.user.id;
     const { title, textContent, tags, entryDate } = req.body;
 
-    const entry = await Entry.findOne({ _id: entryId, userId });
+    const entry = await Entry.findById(entryId);
     if (!entry) {
       return res.status(404).json({ message: 'Entry not found' });
+    }
+    const project = await Project.findOne({ _id: entry.projectId, $or: [{ userId }, { members: userId }] });
+    if (!project) {
+      return res.status(403).json({ message: 'Not authorized for this entry' });
     }
 
     if (title !== undefined) entry.title = title;
@@ -266,9 +274,13 @@ router.delete('/entries/:id', async (req, res) => {
     const entryId = req.params.id;
     const userId = req.user.id;
 
-    const entry = await Entry.findOne({ _id: entryId, userId });
+    const entry = await Entry.findById(entryId);
     if (!entry) {
       return res.status(404).json({ message: 'Entry not found' });
+    }
+    const project = await Project.findOne({ _id: entry.projectId, $or: [{ userId }, { members: userId }] });
+    if (!project) {
+      return res.status(403).json({ message: 'Not authorized for this entry' });
     }
 
     // Delete file from Cloudflare R2 if it exists
