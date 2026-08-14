@@ -211,14 +211,16 @@ export default function ProjectPage({ projectId, onNavigate }) {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Share button for Owners only */}
-            {project && user && (user.id === project.userId || user._id === project.userId) && (
+            {/* Members / Collaborators button for everyone */}
+            {project && user && (
               <button
                 onClick={() => setIsInviteModalOpen(true)}
                 className="flex items-center gap-1.5 px-3 py-2 bg-slate-800 text-white hover:bg-slate-700 rounded-lg text-xs font-semibold cursor-pointer transition"
               >
                 <UserPlus className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Share</span>
+                <span className="hidden sm:inline">
+                  {(user.id === project.userId || user._id === project.userId) ? 'Share' : 'Members'}
+                </span>
               </button>
             )}
 
@@ -518,13 +520,14 @@ export default function ProjectPage({ projectId, onNavigate }) {
 
 
 
-      {/* Invite Modal */}
+      {/* Invite & Collaborators Modal */}
       {project && (
         <InviteModal
           isOpen={isInviteModalOpen}
           onClose={() => setIsInviteModalOpen(false)}
           projectId={project._id}
           projectName={project.name}
+          isOwner={user && (user.id === project.userId || user._id === project.userId)}
         />
       )}
       </div>
