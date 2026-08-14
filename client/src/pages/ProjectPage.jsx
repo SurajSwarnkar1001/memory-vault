@@ -9,6 +9,7 @@ import Modal from '../components/ui/Modal';
 import { groupEntriesByDate } from '../utils/dateGrouping';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import Select from 'react-select';
 import { 
   ArrowLeft, 
   Search, 
@@ -19,6 +20,16 @@ import {
   Info,
   SlidersHorizontal
 } from 'lucide-react';
+
+const typeOptions = [
+  { value: '', label: 'All Types' },
+  { value: 'text', label: 'Notes' },
+  { value: 'link', label: 'Links' },
+  { value: 'voice', label: 'Voice Memos' },
+  { value: 'audio', label: 'Audio files' },
+  { value: 'video', label: 'Videos' },
+  { value: 'image', label: 'Images' }
+];
 
 export default function ProjectPage({ projectId, onNavigate }) {
   const {
@@ -164,7 +175,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
         <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-8">
         {/* Back and Project Header */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => onNavigate('/dashboard')}
               className="rounded-lg p-2 border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition duration-150 cursor-pointer shrink-0"
@@ -243,20 +254,25 @@ export default function ProjectPage({ projectId, onNavigate }) {
               </div>
 
               {/* Type selector */}
-              <div>
-                <select
-                  value={type}
-                  onChange={(e) => setType(e.target.value)}
-                  className="block w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-accent bg-white"
-                >
-                  <option value="">All Types</option>
-                  <option value="text">Notes</option>
-                  <option value="link">Links</option>
-                  <option value="voice">Voice Memos</option>
-                  <option value="audio">Audio files</option>
-                  <option value="video">Videos</option>
-                  <option value="image">Images</option>
-                </select>
+              <div className="w-full">
+                <Select
+                  options={typeOptions}
+                  value={typeOptions.find(opt => opt.value === type) || typeOptions[0]}
+                  onChange={(selected) => setType(selected.value)}
+                  isSearchable={false}
+                  unstyled
+                  classNames={{
+                    control: (state) =>
+                      `w-full rounded-lg border ${state.isFocused ? 'border-accent' : 'border-slate-200'} bg-white px-3 py-[3px] text-xs text-slate-700 transition cursor-pointer min-h-[34px] flex items-center`,
+                    menu: () =>
+                      'mt-1 rounded-lg border border-slate-200 bg-white shadow-lg overflow-hidden text-xs z-50',
+                    option: (state) =>
+                      `px-3 py-2 cursor-pointer transition-colors ${state.isSelected ? 'bg-accent text-white font-semibold' : state.isFocused ? 'bg-slate-50 text-slate-900' : 'text-slate-700'}`,
+                    singleValue: () => 'text-slate-700 leading-none cursor-pointer',
+                    dropdownIndicator: (state) => `text-slate-400 transition-transform ${state.selectProps.menuIsOpen ? 'rotate-180' : ''} p-1 cursor-pointer`,
+                    indicatorSeparator: () => 'hidden',
+                  }}
+                />
               </div>
 
               {/* Tag Search */}
@@ -276,7 +292,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
                   selected={fromDate}
                   onChange={(date) => setFromDate(date)}
                   placeholderText="From Date"
-                  className="block w-full min-w-0 max-w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-accent"
+                  className="block w-full min-w-0 max-w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-accent cursor-pointer"
                   dateFormat="yyyy-MM-dd"
                   isClearable
                   wrapperClassName="w-full"
@@ -285,7 +301,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
                   selected={toDate}
                   onChange={(date) => setToDate(date)}
                   placeholderText="To Date"
-                  className="block w-full min-w-0 max-w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-accent"
+                  className="block w-full min-w-0 max-w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-accent cursor-pointer"
                   dateFormat="yyyy-MM-dd"
                   isClearable
                   wrapperClassName="w-full"
@@ -425,7 +441,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
                 timeIntervals={15}
                 timeCaption="time"
                 dateFormat="yyyy-MM-dd HH:mm"
-                className="block w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-accent"
+                className="block w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-accent cursor-pointer"
                 wrapperClassName="w-full"
               />
             </div>

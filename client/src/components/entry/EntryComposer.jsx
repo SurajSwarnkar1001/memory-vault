@@ -310,7 +310,7 @@ export default function EntryComposer({ onSubmit }) {
                 timeIntervals={15}
                 timeCaption="time"
                 dateFormat="yyyy-MM-dd HH:mm"
-                className="block w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-800 focus:border-accent focus:outline-none focus:ring-0 transition duration-150"
+                className="block w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-800 focus:border-accent focus:outline-none focus:ring-0 transition duration-150 cursor-pointer"
                 wrapperClassName="w-full"
               />
             </div>
