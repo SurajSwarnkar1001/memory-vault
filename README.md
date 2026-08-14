@@ -11,6 +11,7 @@ Built using a modern monorepo architecture with **NodeJS/Express** (backend) and
 ## 🌟 Key Features
 
 *   **Project Workspaces**: Create, edit, and delete distinct project categories to separate personal logs, code assets, and designs.
+*   **Team Collaboration**: Share project access via secure, time-sensitive email invitations (powered by SMTP & Nodemailer). Collaborators get full read/write access to shared project entries.
 *   **Chronological Timeline**: View project entries grouped chronologically (e.g., *Today*, *Yesterday*, or formatted calendar dates).
 *   **Cloudflare R2 Direct Uploads**: Secure browser-to-bucket file uploads via pre-signed S3 signatures, bypassing server load and memory limits.
 *   **In-Browser Voice & Media**: Record audio memos directly inside the browser using HTML5 capture or upload local audio files to the timeline.
@@ -45,6 +46,13 @@ R2_ACCOUNT_ID=your_cloudflare_r2_account_id
 R2_ACCESS_KEY_ID=your_cloudflare_r2_access_key_id
 R2_SECRET_ACCESS_KEY=your_cloudflare_r2_secret_access_key
 R2_BUCKET_NAME=your_r2_bucket_name
+R2_ENDPOINT=your_r2_endpoint_url
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_16_digit_app_password
+SMTP_FROM=your_email@gmail.com
+CLIENT_URL=http://localhost:5173
 ```
 
 ### 2. Production Deployment (Render Dashboard)
@@ -62,6 +70,13 @@ When hosting on Render, you must add these exact same keys (excluding `PORT` as 
 | `R2_ACCESS_KEY_ID` | R2 API Access Key ID with Read/Write bucket permissions. |
 | `R2_SECRET_ACCESS_KEY`| R2 API Secret Access Key. |
 | `R2_BUCKET_NAME` | The name of your Cloudflare R2 storage bucket. |
+| `R2_ENDPOINT` | The public or API endpoint URL for your R2 bucket. |
+| `SMTP_HOST` | SMTP server host (e.g., smtp.gmail.com). |
+| `SMTP_PORT` | SMTP server port (e.g., 587). |
+| `SMTP_USER` | Email address used for authentication. |
+| `SMTP_PASS` | SMTP App password (if using Gmail, generate an App Password). |
+| `SMTP_FROM` | Sender email address for outbound invites. |
+| `CLIENT_URL` | Your frontend production URL (e.g., `https://memory-vault-eeeg.onrender.com`). |
 
 4. Click **Save Changes** at the bottom to trigger a fresh, secure redeployment.
 
