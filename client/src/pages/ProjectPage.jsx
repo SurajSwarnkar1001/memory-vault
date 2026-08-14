@@ -7,6 +7,8 @@ import EntryComposer from '../components/entry/EntryComposer';
 import EntryCard from '../components/entry/EntryCard';
 import Modal from '../components/ui/Modal';
 import { groupEntriesByDate } from '../utils/dateGrouping';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { 
   ArrowLeft, 
   Search, 
@@ -37,8 +39,8 @@ export default function ProjectPage({ projectId, onNavigate }) {
   const [search, setSearch] = useState('');
   const [type, setType] = useState('');
   const [tag, setTag] = useState('');
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
 
   // Edit / Delete states
@@ -46,7 +48,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
   const [editTitle, setEditTitle] = useState('');
   const [editTextContent, setEditTextContent] = useState('');
   const [editTagsInput, setEditTagsInput] = useState('');
-  const [editEntryDate, setEditEntryDate] = useState('');
+  const [editEntryDate, setEditEntryDate] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const [entryToDelete, setEntryToDelete] = useState(null);
@@ -70,8 +72,10 @@ export default function ProjectPage({ projectId, onNavigate }) {
 
   // Fetch entries based on current filter values
   const loadEntries = useCallback(() => {
-    fetchEntries(projectId, { search, type, tag, from, to });
-  }, [projectId, fetchEntries, search, type, tag, from, to]);
+    const fromStr = fromDate ? fromDate.toLocaleDateString('en-CA') : '';
+    const toStr = toDate ? toDate.toLocaleDateString('en-CA') : '';
+    fetchEntries(projectId, { search, type, tag, from: fromStr, to: toStr });
+  }, [projectId, fetchEntries, search, type, tag, fromDate, toDate]);
 
   useEffect(() => {
     loadEntries();
@@ -95,9 +99,8 @@ export default function ProjectPage({ projectId, onNavigate }) {
     setEditTextContent(entry.textContent || '');
     setEditTagsInput(entry.tags ? entry.tags.join(', ') : '');
     
-    // YYYY-MM-DD format
     const localDate = new Date(entry.entryDate);
-    setEditEntryDate(localDate.toISOString().split('T')[0]);
+    setEditEntryDate(localDate);
     
     setIsEditModalOpen(true);
   };
@@ -116,7 +119,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
       title: editTitle.trim(),
       textContent: editTextContent.trim(),
       tags,
-      entryDate: new Date(editEntryDate).toISOString()
+      entryDate: editEntryDate ? editEntryDate.toISOString() : new Date().toISOString()
     };
 
     const result = await updateEntry(editingEntry._id, data);
@@ -141,11 +144,11 @@ export default function ProjectPage({ projectId, onNavigate }) {
     setSearch('');
     setType('');
     setTag('');
-    setFrom('');
-    setTo('');
+    setFromDate(null);
+    setToDate(null);
   };
 
-  const hasActiveFilters = search || type || tag || from || to;
+  const hasActiveFilters = search || type || tag || fromDate || toDate;
 
   // Grouped Timeline
   const groupedEntries = groupEntriesByDate(entries);
@@ -158,7 +161,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
       <div className="flex-1 flex flex-col min-h-screen overflow-y-auto">
         <Navbar onNavigate={onNavigate} />
 
-        <main className="flex-1 max-w-4xl w-full mx-auto px-6 py-8">
+        <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-8">
         {/* Back and Project Header */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -268,22 +271,24 @@ export default function ProjectPage({ projectId, onNavigate }) {
               </div>
 
               {/* Date pickers placeholder/container */}
-              <div className="flex flex-col sm:flex-row gap-2">
-                <input
-                  type="date"
-                  value={from}
-                  onChange={(e) => setFrom(e.target.value)}
-                  placeholder="From"
-                  className="block w-full rounded-lg border border-slate-200 px-2 py-1.5 text-[10px] text-slate-800 focus:outline-none focus:border-accent"
-                  title="From Date"
+              <div className="flex flex-col sm:flex-row gap-2 w-full min-w-0">
+                <DatePicker
+                  selected={fromDate}
+                  onChange={(date) => setFromDate(date)}
+                  placeholderText="From Date"
+                  className="block w-full min-w-0 max-w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-accent"
+                  dateFormat="yyyy-MM-dd"
+                  isClearable
+                  wrapperClassName="w-full"
                 />
-                <input
-                  type="date"
-                  value={to}
-                  onChange={(e) => setTo(e.target.value)}
-                  placeholder="To"
-                  className="block w-full rounded-lg border border-slate-200 px-2 py-1.5 text-[10px] text-slate-800 focus:outline-none focus:border-accent"
-                  title="To Date"
+                <DatePicker
+                  selected={toDate}
+                  onChange={(date) => setToDate(date)}
+                  placeholderText="To Date"
+                  className="block w-full min-w-0 max-w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-accent"
+                  dateFormat="yyyy-MM-dd"
+                  isClearable
+                  wrapperClassName="w-full"
                 />
               </div>
             </div>
@@ -411,12 +416,17 @@ export default function ProjectPage({ projectId, onNavigate }) {
               <label htmlFor="edit-date" className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
                 Entry Date
               </label>
-              <input
+              <DatePicker
                 id="edit-date"
-                type="date"
-                value={editEntryDate}
-                onChange={(e) => setEditEntryDate(e.target.value)}
-                className="block w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-900 focus:outline-none"
+                selected={editEntryDate}
+                onChange={(date) => setEditEntryDate(date)}
+                showTimeSelect
+                timeFormat="HH:mm"
+                timeIntervals={15}
+                timeCaption="time"
+                dateFormat="yyyy-MM-dd HH:mm"
+                className="block w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-accent"
+                wrapperClassName="w-full"
               />
             </div>
           </div>
