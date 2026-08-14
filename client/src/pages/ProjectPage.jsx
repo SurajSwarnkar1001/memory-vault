@@ -6,6 +6,7 @@ import Sidebar from '../components/layout/Sidebar';
 import EntryComposer from '../components/entry/EntryComposer';
 import EntryCard from '../components/entry/EntryCard';
 import Modal from '../components/ui/Modal';
+import Skeleton from '../components/ui/Skeleton';
 import InviteModal from '../components/project/InviteModal';
 import { useAuth } from '../context/AuthContext';
 import { groupEntriesByDate } from '../utils/dateGrouping';
@@ -168,6 +169,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
 
   // Grouped Timeline
   const groupedEntries = groupEntriesByDate(entries);
+  const isOwner = user && project && (user.id === project.userId || user._id === project.userId);
 
   return (
     <div className="min-h-screen bg-bg-light flex">
@@ -189,7 +191,10 @@ export default function ProjectPage({ projectId, onNavigate }) {
               <ArrowLeft className="h-4 w-4" />
             </button>
             {projectLoading ? (
-              <div className="h-6 w-32 bg-slate-200 animate-pulse rounded-md" />
+              <div className="flex flex-col gap-1.5">
+                <Skeleton className="h-6 w-48" />
+                <Skeleton className="h-4 w-32" />
+              </div>
             ) : project ? (
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
@@ -219,7 +224,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
               >
                 <UserPlus className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">
-                  {(user.id === project.userId || user._id === project.userId) ? 'Share' : 'Members'}
+                  {isOwner ? 'Share' : 'Members'}
                 </span>
               </button>
             )}
@@ -338,9 +343,22 @@ export default function ProjectPage({ projectId, onNavigate }) {
 
         {/* Timeline Content */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-16 text-slate-400 gap-2">
-            <Loader2 className="h-6 w-6 animate-spin text-accent" />
-            <span className="text-xs">Loading timeline...</span>
+          <div className="space-y-6 mt-4">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="flex gap-4">
+                <div className="w-12 sm:w-16 flex-shrink-0 pt-1">
+                  <Skeleton className="h-4 w-10 sm:w-12 ml-auto" />
+                </div>
+                <div className="flex-1 bg-white border border-slate-200/60 rounded-xl p-4">
+                  <div className="flex justify-between mb-3">
+                    <Skeleton className="h-4 w-1/4" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                  <Skeleton className="h-3 w-full mb-2" />
+                  <Skeleton className="h-3 w-5/6" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : entries.length === 0 ? (
           /* Empty Timeline */
@@ -468,6 +486,11 @@ export default function ProjectPage({ projectId, onNavigate }) {
           </div>
 
           <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+            {!isOwner && (
+              <span className="text-xs text-red-500 font-semibold mr-auto">
+                Only the owner can edit entries.
+              </span>
+            )}
             <button
               type="button"
               onClick={() => {
@@ -476,14 +499,16 @@ export default function ProjectPage({ projectId, onNavigate }) {
               }}
               className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm hover:bg-slate-50 hover:text-slate-800 transition duration-150 cursor-pointer"
             >
-              Cancel
+              {isOwner ? 'Cancel' : 'Close'}
             </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-accent text-white rounded-lg text-sm hover:bg-accent-dark transition duration-150 cursor-pointer font-medium"
-            >
-              Save Changes
-            </button>
+            {isOwner && (
+              <button
+                type="submit"
+                className="px-4 py-2 bg-accent text-white rounded-lg text-sm hover:bg-accent-dark transition duration-150 cursor-pointer font-medium"
+              >
+                Save Changes
+              </button>
+            )}
           </div>
         </form>
       </Modal>
@@ -496,24 +521,25 @@ export default function ProjectPage({ projectId, onNavigate }) {
       >
         <div className="space-y-4">
           <p className="text-xs text-slate-600 leading-relaxed">
-            Are you sure you want to delete this entry?
-            This will permanently remove it from your timeline.
-            {entryToDelete?.fileKey && ' The corresponding file in Cloudflare R2 will also be deleted.'}
-            This action cannot be undone.
+            {isOwner 
+              ? `Are you sure you want to delete this entry? This will permanently remove it from your timeline.${entryToDelete?.fileKey ? ' The corresponding file in Cloudflare R2 will also be deleted.' : ''} This action cannot be undone.`
+              : 'You do not have permission to delete entries. Only the project owner can perform this action.'}
           </p>
           <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
             <button
               onClick={() => setEntryToDelete(null)}
               className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm hover:bg-slate-50 hover:text-slate-800 transition duration-150 cursor-pointer"
             >
-              Cancel
+              {isOwner ? 'Cancel' : 'Close'}
             </button>
-            <button
-              onClick={handleDeleteEntryConfirm}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition duration-150 cursor-pointer font-medium"
-            >
-              Delete Entry
-            </button>
+            {isOwner && (
+              <button
+                onClick={handleDeleteEntryConfirm}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition duration-150 cursor-pointer font-medium"
+              >
+                Delete Entry
+              </button>
+            )}
           </div>
         </div>
       </Modal>
@@ -527,7 +553,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
           onClose={() => setIsInviteModalOpen(false)}
           projectId={project._id}
           projectName={project.name}
-          isOwner={user && (user.id === project.userId || user._id === project.userId)}
+          isOwner={isOwner}
         />
       )}
       </div>

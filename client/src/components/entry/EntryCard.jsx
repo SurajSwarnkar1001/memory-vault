@@ -68,20 +68,24 @@ export default function EntryCard({ entry, onEdit, onDelete, onTagClick }) {
           </div>
 
           <div className="opacity-0 group-hover:opacity-100 flex gap-1 transition-opacity duration-200">
-            <button
-              onClick={onEdit}
-              className="rounded-lg p-1 text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition duration-150 cursor-pointer"
-              title="Edit Entry"
-            >
-              <Edit3 className="h-3.5 w-3.5" />
-            </button>
-            <button
-              onClick={onDelete}
-              className="rounded-lg p-1 text-slate-400 hover:bg-red-50 hover:text-red-600 transition duration-150 cursor-pointer"
-              title="Delete Entry"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
+            {onEdit && (
+              <button
+                onClick={onEdit}
+                className="rounded-lg p-1 text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition duration-150 cursor-pointer"
+                title="Edit Entry"
+              >
+                <Edit3 className="h-3.5 w-3.5" />
+              </button>
+            )}
+            {onDelete && (
+              <button
+                onClick={onDelete}
+                className="rounded-lg p-1 text-slate-400 hover:bg-red-50 hover:text-red-600 transition duration-150 cursor-pointer"
+                title="Delete Entry"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
         </div>
       </div>

@@ -97,7 +97,7 @@ router.patch('/:id', async (req, res) => {
     
     let project = await Project.findOne({ 
       _id: req.params.id, 
-      $or: [{ userId: req.user.id }, { members: req.user.id }] 
+      userId: req.user.id
     });
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });

@@ -247,7 +247,7 @@ router.patch('/entries/:id', async (req, res) => {
     if (!entry) {
       return res.status(404).json({ message: 'Entry not found' });
     }
-    const project = await Project.findOne({ _id: entry.projectId, $or: [{ userId }, { members: userId }] });
+    const project = await Project.findOne({ _id: entry.projectId, userId });
     if (!project) {
       return res.status(403).json({ message: 'Not authorized for this entry' });
     }
@@ -278,7 +278,7 @@ router.delete('/entries/:id', async (req, res) => {
     if (!entry) {
       return res.status(404).json({ message: 'Entry not found' });
     }
-    const project = await Project.findOne({ _id: entry.projectId, $or: [{ userId }, { members: userId }] });
+    const project = await Project.findOne({ _id: entry.projectId, userId });
     if (!project) {
       return res.status(403).json({ message: 'Not authorized for this entry' });
     }
