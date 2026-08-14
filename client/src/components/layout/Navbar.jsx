@@ -20,7 +20,7 @@ export default function Navbar({ onNavigate }) {
   return (
     <>
       {/* Top Navbar (mobile only) */}
-      <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/60 h-14 flex items-center justify-between px-6 md:hidden">
+      <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/60 h-14 flex items-center justify-between px-4 sm:px-6 md:hidden">
         {/* Brand logo */}
         <div
           className="flex items-center gap-2.5 cursor-pointer"

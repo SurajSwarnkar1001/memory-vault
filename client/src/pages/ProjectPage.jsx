@@ -7,6 +7,9 @@ import EntryComposer from '../components/entry/EntryComposer';
 import EntryCard from '../components/entry/EntryCard';
 import Modal from '../components/ui/Modal';
 import { groupEntriesByDate } from '../utils/dateGrouping';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import Select from 'react-select';
 import { 
   ArrowLeft, 
   Search, 
@@ -17,6 +20,16 @@ import {
   Info,
   SlidersHorizontal
 } from 'lucide-react';
+
+const typeOptions = [
+  { value: '', label: 'All Types' },
+  { value: 'text', label: 'Notes' },
+  { value: 'link', label: 'Links' },
+  { value: 'voice', label: 'Voice Memos' },
+  { value: 'audio', label: 'Audio files' },
+  { value: 'video', label: 'Videos' },
+  { value: 'image', label: 'Images' }
+];
 
 export default function ProjectPage({ projectId, onNavigate }) {
   const {
@@ -37,8 +50,8 @@ export default function ProjectPage({ projectId, onNavigate }) {
   const [search, setSearch] = useState('');
   const [type, setType] = useState('');
   const [tag, setTag] = useState('');
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
 
   // Edit / Delete states
@@ -46,7 +59,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
   const [editTitle, setEditTitle] = useState('');
   const [editTextContent, setEditTextContent] = useState('');
   const [editTagsInput, setEditTagsInput] = useState('');
-  const [editEntryDate, setEditEntryDate] = useState('');
+  const [editEntryDate, setEditEntryDate] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const [entryToDelete, setEntryToDelete] = useState(null);
@@ -70,8 +83,10 @@ export default function ProjectPage({ projectId, onNavigate }) {
 
   // Fetch entries based on current filter values
   const loadEntries = useCallback(() => {
-    fetchEntries(projectId, { search, type, tag, from, to });
-  }, [projectId, fetchEntries, search, type, tag, from, to]);
+    const fromStr = fromDate ? fromDate.toLocaleDateString('en-CA') : '';
+    const toStr = toDate ? toDate.toLocaleDateString('en-CA') : '';
+    fetchEntries(projectId, { search, type, tag, from: fromStr, to: toStr });
+  }, [projectId, fetchEntries, search, type, tag, fromDate, toDate]);
 
   useEffect(() => {
     loadEntries();
@@ -95,9 +110,8 @@ export default function ProjectPage({ projectId, onNavigate }) {
     setEditTextContent(entry.textContent || '');
     setEditTagsInput(entry.tags ? entry.tags.join(', ') : '');
     
-    // YYYY-MM-DD format
     const localDate = new Date(entry.entryDate);
-    setEditEntryDate(localDate.toISOString().split('T')[0]);
+    setEditEntryDate(localDate);
     
     setIsEditModalOpen(true);
   };
@@ -116,7 +130,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
       title: editTitle.trim(),
       textContent: editTextContent.trim(),
       tags,
-      entryDate: new Date(editEntryDate).toISOString()
+      entryDate: editEntryDate ? editEntryDate.toISOString() : new Date().toISOString()
     };
 
     const result = await updateEntry(editingEntry._id, data);
@@ -141,11 +155,11 @@ export default function ProjectPage({ projectId, onNavigate }) {
     setSearch('');
     setType('');
     setTag('');
-    setFrom('');
-    setTo('');
+    setFromDate(null);
+    setToDate(null);
   };
 
-  const hasActiveFilters = search || type || tag || from || to;
+  const hasActiveFilters = search || type || tag || fromDate || toDate;
 
   // Grouped Timeline
   const groupedEntries = groupEntriesByDate(entries);
@@ -158,10 +172,10 @@ export default function ProjectPage({ projectId, onNavigate }) {
       <div className="flex-1 flex flex-col min-h-screen overflow-y-auto">
         <Navbar onNavigate={onNavigate} />
 
-        <main className="flex-1 max-w-4xl w-full mx-auto px-6 py-8">
+        <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-8">
         {/* Back and Project Header */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => onNavigate('/dashboard')}
               className="rounded-lg p-2 border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition duration-150 cursor-pointer shrink-0"
@@ -240,20 +254,25 @@ export default function ProjectPage({ projectId, onNavigate }) {
               </div>
 
               {/* Type selector */}
-              <div>
-                <select
-                  value={type}
-                  onChange={(e) => setType(e.target.value)}
-                  className="block w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-accent bg-white"
-                >
-                  <option value="">All Types</option>
-                  <option value="text">Notes</option>
-                  <option value="link">Links</option>
-                  <option value="voice">Voice Memos</option>
-                  <option value="audio">Audio files</option>
-                  <option value="video">Videos</option>
-                  <option value="image">Images</option>
-                </select>
+              <div className="w-full">
+                <Select
+                  options={typeOptions}
+                  value={typeOptions.find(opt => opt.value === type) || typeOptions[0]}
+                  onChange={(selected) => setType(selected.value)}
+                  isSearchable={false}
+                  unstyled
+                  classNames={{
+                    control: (state) =>
+                      `w-full rounded-lg border ${state.isFocused ? 'border-accent' : 'border-slate-200'} bg-white px-3 py-[3px] text-xs text-slate-700 transition cursor-pointer min-h-[34px] flex items-center`,
+                    menu: () =>
+                      'mt-1 rounded-lg border border-slate-200 bg-white shadow-lg overflow-hidden text-xs z-50',
+                    option: (state) =>
+                      `px-3 py-2 cursor-pointer transition-colors ${state.isSelected ? 'bg-accent text-white font-semibold' : state.isFocused ? 'bg-slate-50 text-slate-900' : 'text-slate-700'}`,
+                    singleValue: () => 'text-slate-700 leading-none cursor-pointer',
+                    dropdownIndicator: (state) => `text-slate-400 transition-transform ${state.selectProps.menuIsOpen ? 'rotate-180' : ''} p-1 cursor-pointer`,
+                    indicatorSeparator: () => 'hidden',
+                  }}
+                />
               </div>
 
               {/* Tag Search */}
@@ -268,22 +287,24 @@ export default function ProjectPage({ projectId, onNavigate }) {
               </div>
 
               {/* Date pickers placeholder/container */}
-              <div className="flex flex-col sm:flex-row gap-2">
-                <input
-                  type="date"
-                  value={from}
-                  onChange={(e) => setFrom(e.target.value)}
-                  placeholder="From"
-                  className="block w-full rounded-lg border border-slate-200 px-2 py-1.5 text-[10px] text-slate-800 focus:outline-none focus:border-accent"
-                  title="From Date"
+              <div className="flex flex-col sm:flex-row gap-2 w-full min-w-0">
+                <DatePicker
+                  selected={fromDate}
+                  onChange={(date) => setFromDate(date)}
+                  placeholderText="From Date"
+                  className="block w-full min-w-0 max-w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-accent cursor-pointer"
+                  dateFormat="yyyy-MM-dd"
+                  isClearable
+                  wrapperClassName="w-full"
                 />
-                <input
-                  type="date"
-                  value={to}
-                  onChange={(e) => setTo(e.target.value)}
-                  placeholder="To"
-                  className="block w-full rounded-lg border border-slate-200 px-2 py-1.5 text-[10px] text-slate-800 focus:outline-none focus:border-accent"
-                  title="To Date"
+                <DatePicker
+                  selected={toDate}
+                  onChange={(date) => setToDate(date)}
+                  placeholderText="To Date"
+                  className="block w-full min-w-0 max-w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-accent cursor-pointer"
+                  dateFormat="yyyy-MM-dd"
+                  isClearable
+                  wrapperClassName="w-full"
                 />
               </div>
             </div>
@@ -411,12 +432,17 @@ export default function ProjectPage({ projectId, onNavigate }) {
               <label htmlFor="edit-date" className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
                 Entry Date
               </label>
-              <input
+              <DatePicker
                 id="edit-date"
-                type="date"
-                value={editEntryDate}
-                onChange={(e) => setEditEntryDate(e.target.value)}
-                className="block w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-900 focus:outline-none"
+                selected={editEntryDate}
+                onChange={(date) => setEditEntryDate(date)}
+                showTimeSelect
+                timeFormat="HH:mm"
+                timeIntervals={15}
+                timeCaption="time"
+                dateFormat="yyyy-MM-dd HH:mm"
+                className="block w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-accent cursor-pointer"
+                wrapperClassName="w-full"
               />
             </div>
           </div>

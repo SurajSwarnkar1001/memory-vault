@@ -96,7 +96,7 @@ export default function EntryCard({ entry, onEdit, onDelete, onTagClick }) {
 
         {entry.type === 'link' && (
           <div className="space-y-2">
-            <p className="text-xs text-slate-600 whitespace-pre-wrap leading-relaxed">
+            <p className="text-xs text-slate-600 whitespace-pre-wrap leading-relaxed break-all">
               {entry.textContent}
             </p>
             <a

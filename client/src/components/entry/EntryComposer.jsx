@@ -1,16 +1,15 @@
 import React, { useState, useRef } from 'react';
 import { FileText, Link2, Mic, FileUp, Calendar, Tag, Plus, Upload, X } from 'lucide-react';
 import VoiceRecorder from './VoiceRecorder';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 export default function EntryComposer({ onSubmit }) {
   const [activeTab, setActiveTab] = useState('text'); // text | link | voice | file
   const [title, setTitle] = useState('');
   const [textContent, setTextContent] = useState('');
   const [tagsInput, setTagsInput] = useState('');
-  const [entryDate, setEntryDate] = useState(() => {
-    const local = new Date();
-    return local.toISOString().split('T')[0];
-  });
+  const [entryDate, setEntryDate] = useState(() => new Date());
   
   // File and media states
   const [selectedFile, setSelectedFile] = useState(null);
@@ -109,7 +108,7 @@ export default function EntryComposer({ onSubmit }) {
     const entryData = {
       title: title.trim(),
       tags,
-      entryDate: new Date(entryDate).toISOString(),
+      entryDate: entryDate ? entryDate.toISOString() : new Date().toISOString(),
     };
 
     let result;
@@ -303,11 +302,16 @@ export default function EntryComposer({ onSubmit }) {
             {/* Date Picker */}
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-slate-300 shrink-0" />
-              <input
-                type="date"
-                value={entryDate}
-                onChange={(e) => setEntryDate(e.target.value)}
-                className="block w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-800 focus:border-accent focus:outline-none focus:ring-0 transition duration-150"
+              <DatePicker
+                selected={entryDate}
+                onChange={(date) => setEntryDate(date)}
+                showTimeSelect
+                timeFormat="HH:mm"
+                timeIntervals={15}
+                timeCaption="time"
+                dateFormat="yyyy-MM-dd HH:mm"
+                className="block w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-800 focus:border-accent focus:outline-none focus:ring-0 transition duration-150 cursor-pointer"
+                wrapperClassName="w-full"
               />
             </div>
           </div>

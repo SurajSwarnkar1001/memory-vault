@@ -52,12 +52,12 @@ export default function DashboardPage({ onNavigate }) {
   return (
     <div className="min-h-screen bg-bg-light flex">
       {/* Desktop left sidebar */}
-      <Sidebar currentPath="#/dashboard" onNavigate={onNavigate} onCreateProject={handleOpenCreateModal} />
+      <Sidebar currentPath="/dashboard" onNavigate={onNavigate} onCreateProject={handleOpenCreateModal} />
 
       <div className="flex-1 flex flex-col min-h-screen overflow-y-auto">
         <Navbar onNavigate={onNavigate} />
 
-        <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-10">
+        <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8 gap-4">
           <div className="min-w-0">
