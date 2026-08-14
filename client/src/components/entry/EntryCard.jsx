@@ -93,7 +93,7 @@ export default function EntryCard({ entry, onEdit, onDelete, onTagClick }) {
       {/* Body Content */}
       <div className="space-y-3">
         {entry.type === 'text' && (
-          <p className="text-xs text-slate-600 whitespace-pre-wrap leading-relaxed select-text">
+          <p className="text-xs text-slate-600 whitespace-pre-wrap leading-relaxed select-text break-words">
             {entry.textContent}
           </p>
         )}

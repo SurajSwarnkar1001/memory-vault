@@ -181,7 +181,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
 
         <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-8">
         {/* Back and Project Header */}
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="mb-6 flex items-center justify-between gap-3 sm:gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => onNavigate('/dashboard')}
@@ -215,12 +215,12 @@ export default function ProjectPage({ projectId, onNavigate }) {
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {/* Members / Collaborators button for everyone */}
             {project && user && (
               <button
                 onClick={() => setIsInviteModalOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-2 bg-slate-800 text-white hover:bg-slate-700 rounded-lg text-xs font-semibold cursor-pointer transition"
+                className="flex items-center justify-center gap-1.5 p-2 sm:px-3 sm:py-2 bg-slate-800 text-white hover:bg-slate-700 rounded-lg text-xs font-semibold cursor-pointer transition shrink-0"
               >
                 <UserPlus className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">
@@ -232,14 +232,14 @@ export default function ProjectPage({ projectId, onNavigate }) {
             {/* Quick Filter toggle */}
             <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-1.5 px-3 py-2 border rounded-lg text-xs font-semibold cursor-pointer transition ${
+            className={`flex items-center justify-center gap-1.5 p-2 sm:px-3 sm:py-2 border rounded-lg text-xs font-semibold cursor-pointer transition shrink-0 ${
               showFilters || hasActiveFilters
                 ? 'bg-accent-light border-accent-light text-accent'
                 : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
             }`}
           >
             <SlidersHorizontal className="h-3.5 w-3.5" />
-            <span>Filters</span>
+            <span className="hidden sm:inline">Filters</span>
             {hasActiveFilters && (
               <span className="ml-1 h-4 w-4 bg-accent text-white rounded-full flex items-center justify-center text-[9px] font-bold">
                 !
