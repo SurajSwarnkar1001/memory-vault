@@ -18,6 +18,7 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '../.env'), override: true });
 
 const app = express();
+app.set('trust proxy', 1); // Required for Render/proxies for rate limiting
 app.disable('x-powered-by');
 const PORT = process.env.PORT || 5000;
 
