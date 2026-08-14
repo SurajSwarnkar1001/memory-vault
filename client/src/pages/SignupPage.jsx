@@ -28,7 +28,13 @@ export default function SignupPage({ onNavigate }) {
     setLoading(false);
 
     if (result.success) {
-      onNavigate('/dashboard');
+      const returnUrl = localStorage.getItem('returnUrl');
+      if (returnUrl) {
+        localStorage.removeItem('returnUrl');
+        onNavigate(returnUrl);
+      } else {
+        onNavigate('/dashboard');
+      }
     } else {
       setError(result.message);
     }

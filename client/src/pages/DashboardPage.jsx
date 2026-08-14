@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import useProjects from '../hooks/useProjects';
 import Navbar from '../components/layout/Navbar';
 import Sidebar from '../components/layout/Sidebar';
+import Skeleton from '../components/ui/Skeleton';
+import { useAuth } from '../context/AuthContext';
 import ProjectCard from '../components/project/ProjectCard';
 import ProjectForm from '../components/project/ProjectForm';
 import Modal from '../components/ui/Modal';
 import { Plus, FolderPlus, Loader2 } from 'lucide-react';
 
 export default function DashboardPage({ onNavigate }) {
+  const { user } = useAuth();
   const {
     projects,
     loading,
@@ -83,9 +86,23 @@ export default function DashboardPage({ onNavigate }) {
 
         {/* Projects content grid */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-400 gap-2">
-            <Loader2 className="h-7 w-7 animate-spin text-accent" />
-            <span className="text-xs font-medium">Loading projects...</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="bg-white border border-slate-200/60 rounded-xl p-5 h-44 flex flex-col justify-between">
+                <div>
+                  <Skeleton className="h-5 w-1/2 mb-3" />
+                  <Skeleton className="h-3 w-full mb-1.5" />
+                  <Skeleton className="h-3 w-5/6 mb-4" />
+                </div>
+                <div className="flex justify-between items-end border-t border-slate-100 pt-4 mt-auto">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                    <Skeleton className="h-3 w-16" />
+                  </div>
+                  <Skeleton className="h-3 w-20" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : projects.length === 0 ? (
           /* Premium Empty State */
@@ -126,12 +143,28 @@ export default function DashboardPage({ onNavigate }) {
         onClose={() => setIsModalOpen(false)}
         title={editingProject ? 'Edit Project' : 'New Project'}
       >
-        <ProjectForm
-          project={editingProject}
-          onSubmit={handleFormSubmit}
-          onCancel={() => setIsModalOpen(false)}
-          submitLabel={editingProject ? 'Save Changes' : 'Create Project'}
-        />
+        {editingProject && user && (editingProject.userId !== user.id && editingProject.userId !== user._id) ? (
+          <div className="space-y-4 pt-2">
+            <p className="text-xs text-red-500 font-semibold leading-relaxed">
+              Only the project owner can edit project details.
+            </p>
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm hover:bg-slate-50 hover:text-slate-800 transition duration-150 cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        ) : (
+          <ProjectForm
+            project={editingProject}
+            onSubmit={handleFormSubmit}
+            onCancel={() => setIsModalOpen(false)}
+            submitLabel={editingProject ? 'Save Changes' : 'Create Project'}
+          />
+        )}
       </Modal>
 
       {/* Delete Project Confirmation Modal */}
@@ -142,22 +175,27 @@ export default function DashboardPage({ onNavigate }) {
       >
         <div className="space-y-4">
           <p className="text-xs text-slate-600 leading-relaxed">
-            Are you sure you want to delete <strong className="text-slate-900">"{projectToDelete?.name}"</strong>?
-            This will permanently remove the project and <strong className="text-red-600 font-semibold">all entries</strong> recorded inside it. This action cannot be undone.
+            {projectToDelete && user && (projectToDelete.userId !== user.id && projectToDelete.userId !== user._id) ? (
+              <span className="text-red-500 font-semibold">You do not have permission to delete this project. Only the project owner can perform this action.</span>
+            ) : (
+              <>Are you sure you want to delete <strong className="text-slate-900">"{projectToDelete?.name}"</strong>? This will permanently remove the project and <strong className="text-red-600 font-semibold">all entries</strong> recorded inside it. This action cannot be undone.</>
+            )}
           </p>
           <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
             <button
               onClick={() => setProjectToDelete(null)}
               className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm hover:bg-slate-50 hover:text-slate-800 transition duration-150 cursor-pointer"
             >
-              Cancel
+              {projectToDelete && user && (projectToDelete.userId !== user.id && projectToDelete.userId !== user._id) ? 'Close' : 'Cancel'}
             </button>
-            <button
-              onClick={handleDeleteConfirm}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition duration-150 cursor-pointer font-medium"
-            >
-              Delete Project
-            </button>
+            {projectToDelete && user && (projectToDelete.userId === user.id || projectToDelete.userId === user._id) && (
+              <button
+                onClick={handleDeleteConfirm}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition duration-150 cursor-pointer font-medium"
+              >
+                Delete Project
+              </button>
+            )}
           </div>
         </div>
       </Modal>

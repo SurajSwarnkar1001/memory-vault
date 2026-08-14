@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import DashboardPage from './pages/DashboardPage';
 import ProjectPage from './pages/ProjectPage';
+import InvitePage from './pages/InvitePage';
 import { Loader2 } from 'lucide-react';
 
 function AppContent() {
@@ -33,7 +34,9 @@ function AppContent() {
     if (loading) return;
 
     const isAuthRoute = ['/login', '/signup'].includes(path);
-    if (!user && !isAuthRoute) {
+    const isInviteRoute = path.startsWith('/invite/');
+    
+    if (!user && !isAuthRoute && !isInviteRoute) {
       navigate('/login');
     } else if (user && isAuthRoute) {
       navigate('/dashboard');
@@ -57,7 +60,19 @@ function AppContent() {
     return null;
   };
 
+  const getInviteToken = () => {
+    if (path.startsWith('/invite/')) {
+      return path.split('/invite/')[1];
+    }
+    return null;
+  };
+
   const projectId = getProjectId();
+  const inviteToken = getInviteToken();
+
+  if (inviteToken) {
+    return <InvitePage token={inviteToken} onNavigate={navigate} />;
+  }
 
   // Render correct pages
   if (!user) {

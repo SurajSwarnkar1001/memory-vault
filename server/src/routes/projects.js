@@ -2,6 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import Project from '../models/Project.js';
 import Entry from '../models/Entry.js';
+import User from '../models/User.js';
+import Invitation from '../models/Invitation.js';
 import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -17,7 +19,7 @@ router.get('/', async (req, res) => {
     
     // Aggregation to fetch projects along with counts and last entry dates
     const projects = await Project.aggregate([
-      { $match: { userId: userIdObj } },
+      { $match: { $or: [{ userId: userIdObj }, { members: userIdObj }] } },
       {
         $lookup: {
           from: 'entries',
@@ -32,6 +34,8 @@ router.get('/', async (req, res) => {
           description: 1,
           color: 1,
           archived: 1,
+          userId: 1,
+          members: 1,
           createdAt: 1,
           updatedAt: 1,
           entryCount: { $size: '$entries' },
@@ -91,7 +95,10 @@ router.patch('/:id', async (req, res) => {
   try {
     const { name, description, color, archived } = req.body;
     
-    let project = await Project.findOne({ _id: req.params.id, userId: req.user.id });
+    let project = await Project.findOne({ 
+      _id: req.params.id, 
+      userId: req.user.id
+    });
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
@@ -134,6 +141,46 @@ router.delete('/:id', async (req, res) => {
   } catch (error) {
     console.error('Delete project error:', error);
     res.status(500).json({ message: 'Error deleting project' });
+  }
+});
+
+// @route   GET /api/projects/:id/members
+// @desc    Get project owner, members, and pending invites
+router.get('/:id/members', async (req, res) => {
+  try {
+    const project = await Project.findOne({ 
+      _id: req.params.id, 
+      $or: [{ userId: req.user.id }, { members: req.user.id }] 
+    });
+    
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+
+    // Get owner details
+    const owner = await User.findById(project.userId).select('name email _id');
+    
+    // Get members details
+    const members = await User.find({ _id: { $in: project.members } }).select('name email _id');
+    
+    // Get pending invites (only if the requester is the owner)
+    let pendingInvites = [];
+    if (project.userId.toString() === req.user.id) {
+      pendingInvites = await Invitation.find({
+        projectId: project._id,
+        status: 'pending',
+        expiresAt: { $gt: new Date() }
+      }).select('email status expiresAt _id');
+    }
+
+    res.json({
+      owner,
+      members,
+      pendingInvites
+    });
+  } catch (error) {
+    console.error('Fetch project members error:', error);
+    res.status(500).json({ message: 'Error retrieving project members' });
   }
 });
 
