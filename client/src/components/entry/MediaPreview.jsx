@@ -117,19 +117,6 @@ export default function MediaPreview({ entry }) {
         </div>
       )}
 
-      {/* Download Action */}
-      <div className="flex justify-start">
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          download={entry.fileName}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-slate-200 rounded-lg text-[10px] font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition duration-150"
-        >
-          <Download className="h-3 w-3" />
-          <span>Download {entry.type === 'voice' ? 'audio' : 'file'}</span>
-        </a>
-      </div>
     </div>
   );
 }

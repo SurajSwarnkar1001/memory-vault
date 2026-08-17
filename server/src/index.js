@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 
 import authRoutes from './routes/auth.js';
 import projectRoutes from './routes/projects.js';
@@ -18,6 +20,8 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '../.env'), override: true });
 
 const app = express();
+const server = createServer(app);
+
 app.set('trust proxy', 1); // Required for Render/proxies for rate limiting
 app.disable('x-powered-by');
 const PORT = process.env.PORT || 5000;
@@ -28,6 +32,26 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200,
 };
+
+const io = new Server(server, {
+  cors: corsOptions
+});
+
+app.set('io', io); // Make io available in routes
+
+io.on('connection', (socket) => {
+  console.log('Socket connected:', socket.id);
+  
+  socket.on('join-project', (projectId) => {
+    socket.join(projectId);
+    console.log(`Socket ${socket.id} joined project room: ${projectId}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Socket disconnected:', socket.id);
+  });
+});
+
 app.use(cors(corsOptions));
 
 // General middleware
@@ -83,7 +107,7 @@ mongoose
   .connect(MONGODB_URI)
   .then(() => {
     console.log('Successfully connected to MongoDB.');
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
   })

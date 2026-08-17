@@ -13,6 +13,7 @@ import { groupEntriesByDate } from '../utils/dateGrouping';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Select from 'react-select';
+import { io } from 'socket.io-client';
 import { 
   ArrowLeft, 
   Search, 
@@ -45,6 +46,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
     uploadFile,
     updateEntry,
     deleteEntry,
+    setEntries,
   } = useEntries();
 
   const [project, setProject] = useState(null);
@@ -97,6 +99,41 @@ export default function ProjectPage({ projectId, onNavigate }) {
   useEffect(() => {
     loadEntries();
   }, [loadEntries]);
+
+  // Real-time comments socket connection
+  useEffect(() => {
+    if (!projectId) return;
+
+    // Connect directly to backend to avoid Vite proxy issues with WebSockets
+    const backendUrl = import.meta.env.VITE_API_URL 
+      ? import.meta.env.VITE_API_URL.replace('/api', '') 
+      : 'http://localhost:5001';
+      
+    const socket = io(backendUrl, {
+      withCredentials: true
+    });
+
+    socket.emit('join-project', projectId);
+
+    socket.on('new-comment', (data) => {
+      const { entryId, comment } = data;
+      setEntries((prevEntries) => 
+        prevEntries.map(entry => {
+          if (entry._id === entryId) {
+            return {
+              ...entry,
+              comments: [...(entry.comments || []), comment]
+            };
+          }
+          return entry;
+        })
+      );
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [projectId, setEntries]);
 
   // Handle entry creation
   const handleCreateEntry = async (data) => {

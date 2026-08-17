@@ -17,6 +17,8 @@ Built using a modern monorepo architecture with **NodeJS/Express** (backend) and
 *   **In-Browser Voice & Media**: Record audio memos directly inside the browser using HTML5 capture or upload local audio files to the timeline.
 *   **JWT Cookie-based Auth**: Secure user session tracking utilizing Access and Refresh JWT tokens stored in secure, `httpOnly` cookies.
 *   **Security Hardened**: Protected with security headers (hiding `X-Powered-By`), CORS verification, and brute-force rate-limiting on sensitive auth routes.
+*   **Live Comments (Real-time)**: Built-in WebSocket connection (via Socket.io) enables real-time chatting and commenting on specific entries without needing to refresh the page.
+*   **Universal Media Downloads**: Securely download any media asset (Images, Videos, PDFs, Audio) using auto-generated pre-signed URLs from the backend directly from the entry timeline.
 *   **Fully Responsive UI**: Mobile-optimized layouts featuring a collapsible mobile slide-out settings drawer, desktop left sidebar, and responsive action buttons.
 
 ---
