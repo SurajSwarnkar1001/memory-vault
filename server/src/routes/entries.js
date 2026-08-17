@@ -64,7 +64,9 @@ router.get('/:id/entries', async (req, res) => {
       ];
     }
 
-    const entries = await Entry.find(filter).sort({ entryDate: -1 });
+    const entries = await Entry.find(filter)
+      .sort({ entryDate: -1 })
+      .populate('comments.userId', 'name email');
     res.json(entries);
   } catch (error) {
     console.error('Fetch entries error:', error);
@@ -298,6 +300,59 @@ router.delete('/entries/:id', async (req, res) => {
   } catch (error) {
     console.error('Delete entry error:', error);
     res.status(500).json({ message: 'Error deleting entry' });
+  }
+});
+
+// @route   POST /api/entries/:id/comments
+// @desc    Add a comment to an entry
+router.post('/entries/:id/comments', async (req, res) => {
+  try {
+    const entryId = req.params.id;
+    const userId = req.user.id;
+    const { text } = req.body;
+
+    if (!text || !text.trim()) {
+      return res.status(400).json({ message: 'Comment text is required' });
+    }
+
+    const entry = await Entry.findById(entryId);
+    if (!entry) {
+      return res.status(404).json({ message: 'Entry not found' });
+    }
+
+    // Verify user is part of the project
+    const project = await Project.findOne({ _id: entry.projectId, $or: [{ userId }, { members: userId }] });
+    if (!project) {
+      return res.status(403).json({ message: 'Not authorized for this entry' });
+    }
+
+    // Add comment
+    const newComment = {
+      userId,
+      text: text.trim(),
+      createdAt: new Date()
+    };
+    
+    entry.comments.push(newComment);
+    await entry.save();
+
+    // Re-fetch with populated user to emit full data
+    const populatedEntry = await Entry.findById(entryId).populate('comments.userId', 'name email');
+    const populatedComment = populatedEntry.comments[populatedEntry.comments.length - 1];
+
+    // Emit socket event to everyone in the project room
+    const io = req.app.get('io');
+    if (io) {
+      io.to(entry.projectId.toString()).emit('new-comment', {
+        entryId: entry._id.toString(),
+        comment: populatedComment
+      });
+    }
+
+    res.json(populatedComment);
+  } catch (error) {
+    console.error('Add comment error:', error);
+    res.status(500).json({ message: 'Error adding comment' });
   }
 });
 

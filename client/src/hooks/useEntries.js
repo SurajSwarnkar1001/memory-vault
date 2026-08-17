@@ -121,5 +121,6 @@ export default function useEntries() {
     uploadFile,
     updateEntry,
     deleteEntry,
+    setEntries,
   };
 }
