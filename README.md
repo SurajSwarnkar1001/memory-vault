@@ -1,4 +1,4 @@
-# memory vault by suraj swarnkar
+# memory vault by suraj
 
 A premium personal and project asset memory vault web app designed to track and organize workspace logs, voice notes, links, and documents in a unified, secure platform. 
 
