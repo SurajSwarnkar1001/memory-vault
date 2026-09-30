@@ -13,6 +13,7 @@ import authRoutes from './routes/auth.js';
 import projectRoutes from './routes/projects.js';
 import entryRoutes from './routes/entries.js';
 import inviteRoutes from './routes/invites.js';
+import aiRoutes from './routes/ai.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -73,6 +74,7 @@ app.use('/api/projects', inviteRoutes); // Must be before projectRoutes to avoid
 app.use('/api/projects', projectRoutes);
 app.use('/api/projects', entryRoutes);
 app.use('/api', entryRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

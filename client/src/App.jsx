@@ -5,6 +5,7 @@ import SignupPage from './pages/SignupPage';
 import DashboardPage from './pages/DashboardPage';
 import ProjectPage from './pages/ProjectPage';
 import InvitePage from './pages/InvitePage';
+import AiChatPage from './pages/AiChatPage';
 import { Loader2 } from 'lucide-react';
 
 function AppContent() {
@@ -84,6 +85,10 @@ function AppContent() {
 
   if (projectId) {
     return <ProjectPage projectId={projectId} onNavigate={navigate} />;
+  }
+
+  if (path === '/ai-chat') {
+    return <AiChatPage onNavigate={navigate} />;
   }
 
   // Default page is Dashboard
