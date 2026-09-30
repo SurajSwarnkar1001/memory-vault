@@ -7,7 +7,6 @@ import rateLimit from 'express-rate-limit';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createServer } from 'http';
-import { Server } from 'socket.io';
 
 import authRoutes from './routes/auth.js';
 import projectRoutes from './routes/projects.js';
@@ -34,24 +33,7 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 
-const io = new Server(server, {
-  cors: corsOptions
-});
 
-app.set('io', io); // Make io available in routes
-
-io.on('connection', (socket) => {
-  console.log('Socket connected:', socket.id);
-  
-  socket.on('join-project', (projectId) => {
-    socket.join(projectId);
-    console.log(`Socket ${socket.id} joined project room: ${projectId}`);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('Socket disconnected:', socket.id);
-  });
-});
 
 app.use(cors(corsOptions));
 
