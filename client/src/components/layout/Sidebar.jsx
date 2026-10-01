@@ -58,7 +58,7 @@ export default function Sidebar({ currentPath, onNavigate, onCreateProject }) {
                 }`}
               >
                 <Bot className="h-4 w-4" />
-                <span>Ask AI</span>
+                <span>Vault AI</span>
               </button>
             </div>
           </div>

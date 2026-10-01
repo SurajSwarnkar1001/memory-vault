@@ -109,3 +109,9 @@ input:-webkit-autofill:focus {
   color: white !important;
   font-weight: 600 !important;
 }
+
+@media (min-width: 768px) {
+  .ai-drawer-desktop {
+    width: var(--desktop-width, 400px) !important;
+  }
+}

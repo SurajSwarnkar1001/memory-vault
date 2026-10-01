@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Loader2 } from 'lucide-react';
 import api from '../api';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import Sidebar from '../components/layout/Sidebar';
 import Navbar from '../components/layout/Navbar';
 
@@ -9,7 +10,26 @@ export default function AiChatPage({ onNavigate }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [projectName, setProjectName] = useState(null);
   const endOfMessagesRef = useRef(null);
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  const projectId = urlParams.get('projectId');
+
+  useEffect(() => {
+    if (projectId) {
+      const fetchProject = async () => {
+        try {
+          const res = await api.get('/projects');
+          const p = res.data.find(proj => proj._id === projectId);
+          if (p) setProjectName(p.name);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+      fetchProject();
+    }
+  }, [projectId]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -28,7 +48,10 @@ export default function AiChatPage({ onNavigate }) {
     setIsLoading(true);
 
     try {
-      const { data } = await api.post('/ai/chat', { messages: updatedMessages });
+      const { data } = await api.post('/ai/chat', { 
+        messages: updatedMessages,
+        projectId: projectId
+      });
       setMessages([...updatedMessages, { role: 'assistant', content: data.response }]);
     } catch (error) {
       console.error('AI Error:', error);
@@ -51,10 +74,15 @@ export default function AiChatPage({ onNavigate }) {
         {/* Chat Interface */}
         <div className="flex-1 flex flex-col bg-slate-50 relative overflow-hidden">
           {/* Header */}
-          <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-center shadow-sm z-10 shrink-0">
+          <div className="bg-white border-b border-slate-200 px-6 py-4 flex flex-col items-center justify-center shadow-sm z-10 shrink-0">
             <h1 className="font-bold text-slate-800 text-lg flex items-center gap-2">
-              <Bot className="text-accent" /> Ask AI
+              <Bot className="text-accent" /> Vault AI
             </h1>
+            {projectName && (
+              <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full mt-1">
+                Context: {projectName}
+              </span>
+            )}
           </div>
 
           {/* Chat Area */}
@@ -84,8 +112,10 @@ export default function AiChatPage({ onNavigate }) {
                       }`}
                     >
                       {msg.role === 'assistant' ? (
-                        <div className="prose prose-sm prose-slate max-w-none">
-                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        <div className="prose prose-sm prose-slate max-w-none prose-p:leading-relaxed prose-pre:bg-slate-800 prose-pre:text-slate-100 prose-td:border prose-th:border prose-th:bg-slate-100 prose-table:border-collapse">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {msg.content}
+                          </ReactMarkdown>
                         </div>
                       ) : (
                         <p className="text-[15px] whitespace-pre-wrap leading-relaxed">{msg.content}</p>
