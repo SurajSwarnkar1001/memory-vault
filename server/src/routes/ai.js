@@ -18,10 +18,13 @@ router.post('/chat', protect, async (req, res) => {
 
     let systemPrompt = 'You are a helpful AI assistant integrated into a workspace app called Memory Vault. Be concise, smart, and helpful.';
 
+    let entries = [];
+    let project = null;
+
     // If projectId is provided, fetch project context
     if (projectId) {
       // Verify user has access to project
-      const project = await Project.findOne({ 
+      project = await Project.findOne({ 
         _id: projectId, 
         $or: [{ userId: req.user.id }, { members: req.user.id }] 
       });
@@ -30,7 +33,6 @@ router.post('/chat', protect, async (req, res) => {
         // Extract the latest user question to use as a search query
         const lastUserMessage = messages.slice().reverse().find(m => m.role === 'user')?.content || '';
         
-        let entries = [];
         if (lastUserMessage.trim()) {
           // Try text search first
           entries = await Entry.find(
@@ -95,6 +97,20 @@ Based ONLY on the context above and your general knowledge, answer the user's qu
     res.json({ response: aiMessage });
   } catch (error) {
     console.error('AI Chat Error:', error);
+    
+    // Fallback Mode: If AI is down but we found project entries, return them as search results
+    if (typeof entries !== 'undefined' && entries.length > 0) {
+      let fallbackMessage = `⚠️ **Vault AI is currently offline or unreachable.**\n\nHowever, I searched your project and found these relevant notes:\n\n`;
+      
+      entries.forEach(e => {
+        fallbackMessage += `**${e.title || 'Untitled'}** (${new Date(e.entryDate).toLocaleDateString()})\n`;
+        const preview = e.textContent ? (e.textContent.length > 200 ? e.textContent.substring(0, 200) + '...' : e.textContent) : 'No text content';
+        fallbackMessage += `> ${preview}\n\n`;
+      });
+      
+      return res.json({ response: fallbackMessage });
+    }
+
     res.status(500).json({ message: 'Failed to communicate with AI' });
   }
 });
