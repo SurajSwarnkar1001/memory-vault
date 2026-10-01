@@ -221,9 +221,9 @@ export default function ProjectPage({ projectId, onNavigate }) {
         <Navbar onNavigate={onNavigate} />
 
         <div className="flex flex-1 overflow-hidden">
-          <main className={`flex-1 w-full px-4 sm:px-6 py-8 transition-all duration-300 overflow-y-auto ${showAiChat ? 'max-w-4xl mx-auto pr-8' : 'max-w-7xl mx-auto'}`}>
+          <main className={`flex-1 w-full px-4 sm:px-6 pb-8 transition-all duration-300 overflow-y-auto ${showAiChat ? 'max-w-4xl mx-auto pr-8' : 'max-w-7xl mx-auto'}`}>
         {/* Back and Project Header */}
-        <div className="sticky top-0 z-30 bg-bg-light/95 backdrop-blur-md pb-4 pt-2 -mt-2 mb-6 flex items-center justify-between gap-3 sm:gap-4 border-b border-transparent">
+        <div className="sticky top-0 z-30 bg-bg-light pt-8 pb-4 mb-6 flex items-center justify-between gap-3 sm:gap-4 border-b border-transparent">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => onNavigate('/dashboard')}

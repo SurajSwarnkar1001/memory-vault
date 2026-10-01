@@ -21,13 +21,13 @@ export default function AiChatPanel({ projectId, projectName, onClose }) {
 
     const userMessage = { role: 'user', content: input };
     const updatedMessages = [...messages, userMessage];
-    
+
     setMessages(updatedMessages);
     setInput('');
     setIsLoading(true);
 
     try {
-      const { data } = await api.post('/ai/chat', { 
+      const { data } = await api.post('/ai/chat', {
         messages: updatedMessages,
         projectId: projectId
       });
@@ -35,8 +35,8 @@ export default function AiChatPanel({ projectId, projectName, onClose }) {
     } catch (error) {
       console.error('AI Error:', error);
       setMessages([
-        ...updatedMessages, 
-        { role: 'assistant', content: '⚠️ **Error:** Failed to connect to the AI model. Please ensure the backend and Ollama API are running.' }
+        ...updatedMessages,
+        { role: 'assistant', content: '⚠️ **Error:** Failed to connect to the AI model. Please ensure the backend and Ollama are running.' }
       ]);
     } finally {
       setIsLoading(false);
@@ -57,7 +57,7 @@ export default function AiChatPanel({ projectId, projectName, onClose }) {
             </span>
           )}
         </div>
-        <button 
+        <button
           onClick={onClose}
           className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition cursor-pointer"
         >
@@ -85,13 +85,12 @@ export default function AiChatPanel({ projectId, projectName, onClose }) {
                     <Bot className="h-3.5 w-3.5" />
                   </div>
                 )}
-                
-                <div 
-                  className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
-                    msg.role === 'user' 
-                      ? 'bg-slate-800 text-white shadow-sm' 
+
+                <div
+                  className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${msg.role === 'user'
+                      ? 'bg-slate-800 text-white shadow-sm'
                       : 'bg-white text-slate-800 border border-slate-200 shadow-sm'
-                  }`}
+                    }`}
                 >
                   {msg.role === 'assistant' ? (
                     <div className="prose prose-sm prose-slate max-w-none text-xs prose-p:leading-relaxed prose-pre:bg-slate-800 prose-pre:text-slate-100 prose-td:border prose-th:border prose-th:bg-slate-100 prose-table:border-collapse">
@@ -130,7 +129,7 @@ export default function AiChatPanel({ projectId, projectName, onClose }) {
 
       {/* Input Area */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-50 via-slate-50 to-transparent pt-6 pb-4 px-4">
-        <form 
+        <form
           onSubmit={handleSubmit}
           className="relative max-w-full mx-auto bg-white border border-slate-200 rounded-xl shadow-md overflow-hidden focus-within:ring-2 focus-within:ring-accent/20 focus-within:border-accent transition-all"
         >
