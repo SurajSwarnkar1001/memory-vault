@@ -7,12 +7,12 @@ import rateLimit from 'express-rate-limit';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createServer } from 'http';
-import { Server } from 'socket.io';
 
 import authRoutes from './routes/auth.js';
 import projectRoutes from './routes/projects.js';
 import entryRoutes from './routes/entries.js';
 import inviteRoutes from './routes/invites.js';
+import aiRoutes from './routes/ai.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,24 +33,7 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 
-const io = new Server(server, {
-  cors: corsOptions
-});
 
-app.set('io', io); // Make io available in routes
-
-io.on('connection', (socket) => {
-  console.log('Socket connected:', socket.id);
-  
-  socket.on('join-project', (projectId) => {
-    socket.join(projectId);
-    console.log(`Socket ${socket.id} joined project room: ${projectId}`);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('Socket disconnected:', socket.id);
-  });
-});
 
 app.use(cors(corsOptions));
 
@@ -73,6 +56,7 @@ app.use('/api/projects', inviteRoutes); // Must be before projectRoutes to avoid
 app.use('/api/projects', projectRoutes);
 app.use('/api/projects', entryRoutes);
 app.use('/api', entryRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

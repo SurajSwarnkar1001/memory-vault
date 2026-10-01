@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { LogOut, User as UserIcon, Folder, Plus } from 'lucide-react';
+import { LogOut, User as UserIcon, Folder, Plus, Bot, Loader2, Send } from 'lucide-react';
+import api from '../../api';
 
 export default function Sidebar({ currentPath, onNavigate, onCreateProject }) {
   const { user, logout } = useAuth();
@@ -43,6 +44,21 @@ export default function Sidebar({ currentPath, onNavigate, onCreateProject }) {
               >
                 <Folder className="h-4 w-4" />
                 <span>All Projects</span>
+              </button>
+            </div>
+            
+            {/* AI Search Navigation */}
+            <div className="mt-2 space-y-1">
+              <button
+                onClick={() => onNavigate('/ai-chat')}
+                className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                  currentPath === '/ai-chat'
+                    ? 'bg-accent-light text-accent'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                <Bot className="h-4 w-4" />
+                <span>Vault AI</span>
               </button>
             </div>
           </div>

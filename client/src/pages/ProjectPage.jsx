@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import useEntries from '../hooks/useEntries';
 import api from '../api';
 import Navbar from '../components/layout/Navbar';
 import Sidebar from '../components/layout/Sidebar';
 import EntryComposer from '../components/entry/EntryComposer';
 import EntryCard from '../components/entry/EntryCard';
+import AiChatPanel from '../components/ai/AiChatPanel';
 import Modal from '../components/ui/Modal';
 import Skeleton from '../components/ui/Skeleton';
 import InviteModal from '../components/project/InviteModal';
@@ -13,7 +14,7 @@ import { groupEntriesByDate } from '../utils/dateGrouping';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import Select from 'react-select';
-import { io } from 'socket.io-client';
+
 import { 
   ArrowLeft, 
   Search, 
@@ -23,7 +24,8 @@ import {
   Loader2, 
   Info,
   SlidersHorizontal,
-  UserPlus
+  UserPlus,
+  Bot
 } from 'lucide-react';
 
 const typeOptions = [
@@ -52,7 +54,43 @@ export default function ProjectPage({ projectId, onNavigate }) {
   const [project, setProject] = useState(null);
   const [projectLoading, setProjectLoading] = useState(true);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [showAiChat, setShowAiChat] = useState(false);
+  const [aiDrawerWidth, setAiDrawerWidth] = useState(400);
+  const isResizing = useRef(false);
   const { user } = useAuth();
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isResizing.current) return;
+      let newWidth = window.innerWidth - e.clientX;
+      if (newWidth < 300) newWidth = 300;
+      if (newWidth > 800) newWidth = 800;
+      if (newWidth > window.innerWidth - 100) newWidth = window.innerWidth - 100;
+      setAiDrawerWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      if (isResizing.current) {
+        isResizing.current = false;
+        document.body.style.cursor = 'default';
+        document.body.style.userSelect = 'auto';
+      }
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
+
+  const handleMouseDown = (e) => {
+    e.preventDefault();
+    isResizing.current = true;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
 
   // Filter States
   const [search, setSearch] = useState('');
@@ -100,40 +138,6 @@ export default function ProjectPage({ projectId, onNavigate }) {
     loadEntries();
   }, [loadEntries]);
 
-  // Real-time comments socket connection
-  useEffect(() => {
-    if (!projectId) return;
-
-    // Connect directly to backend to avoid Vite proxy issues with WebSockets
-    const backendUrl = import.meta.env.VITE_API_URL 
-      ? import.meta.env.VITE_API_URL.replace('/api', '') 
-      : 'http://localhost:5001';
-      
-    const socket = io(backendUrl, {
-      withCredentials: true
-    });
-
-    socket.emit('join-project', projectId);
-
-    socket.on('new-comment', (data) => {
-      const { entryId, comment } = data;
-      setEntries((prevEntries) => 
-        prevEntries.map(entry => {
-          if (entry._id === entryId) {
-            return {
-              ...entry,
-              comments: [...(entry.comments || []), comment]
-            };
-          }
-          return entry;
-        })
-      );
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [projectId, setEntries]);
 
   // Handle entry creation
   const handleCreateEntry = async (data) => {
@@ -213,12 +217,13 @@ export default function ProjectPage({ projectId, onNavigate }) {
       {/* Desktop left sidebar */}
       <Sidebar currentPath={`/project/${projectId}`} onNavigate={onNavigate} />
 
-      <div className="flex-1 flex flex-col min-h-screen overflow-y-auto">
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <Navbar onNavigate={onNavigate} />
 
-        <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-8">
+        <div className="flex flex-1 overflow-hidden">
+          <main className={`flex-1 w-full px-4 sm:px-6 pb-8 transition-all duration-300 overflow-y-auto ${showAiChat ? 'max-w-4xl mx-auto pr-8' : 'max-w-7xl mx-auto'}`}>
         {/* Back and Project Header */}
-        <div className="mb-6 flex items-center justify-between gap-3 sm:gap-4">
+        <div className="sticky top-0 z-30 bg-bg-light pt-8 pb-4 mb-6 flex items-center justify-between gap-3 sm:gap-4 border-b border-transparent">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => onNavigate('/dashboard')}
@@ -253,6 +258,18 @@ export default function ProjectPage({ projectId, onNavigate }) {
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
+            {/* Vault AI button */}
+            <button
+              onClick={() => setShowAiChat(!showAiChat)}
+              className={`flex items-center justify-center gap-1.5 p-2 sm:px-3 sm:py-2 rounded-lg text-xs font-semibold cursor-pointer transition shrink-0 shadow-sm ${
+                showAiChat ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-accent text-white hover:bg-accent-dark'
+              }`}
+              title="Ask Vault AI about this project"
+            >
+              <Bot className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">{showAiChat ? 'Close Vault AI' : 'Vault AI'}</span>
+            </button>
+
             {/* Members / Collaborators button for everyone */}
             {project && user && (
               <button
@@ -447,6 +464,35 @@ export default function ProjectPage({ projectId, onNavigate }) {
           </div>
         )}
       </main>
+
+      {/* AI Chat Drawer */}
+      {showAiChat && (
+        <>
+          {/* Mobile Overlay Background */}
+          <div 
+            className="fixed inset-0 bg-slate-900/60 z-40 md:hidden" 
+            onClick={() => setShowAiChat(false)}
+          />
+          <div 
+            className="fixed inset-y-0 right-0 z-50 w-[85vw] max-w-[400px] bg-slate-50 shadow-2xl flex flex-col md:relative md:z-auto md:w-auto md:max-w-none md:shadow-none md:h-full ai-drawer-desktop"
+            style={{ '--desktop-width': `${aiDrawerWidth}px` }}
+          >
+            {/* Resizer Handle (Desktop Only) */}
+            <div 
+              className="absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-accent/50 active:bg-accent z-50 transition-colors hidden md:block"
+              onMouseDown={handleMouseDown}
+            />
+            <div className="flex-1 w-full h-full overflow-hidden border-l border-slate-200 bg-slate-50">
+              <AiChatPanel 
+                projectId={projectId} 
+                projectName={project?.name} 
+                onClose={() => setShowAiChat(false)} 
+              />
+            </div>
+          </div>
+        </>
+      )}
+    </div>
 
       {/* Edit Entry Modal */}
       <Modal

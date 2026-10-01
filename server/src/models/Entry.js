@@ -53,25 +53,7 @@ const entrySchema = new mongoose.Schema(
       required: true,
       default: Date.now,
       index: true,
-    },
-    comments: [
-      {
-        userId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'User',
-          required: true,
-        },
-        text: {
-          type: String,
-          required: true,
-          trim: true,
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now,
-        },
-      }
-    ],
+    }
   },
   {
     timestamps: true,
@@ -80,6 +62,9 @@ const entrySchema = new mongoose.Schema(
 
 // Index to help with sorting and filtering entries
 entrySchema.index({ projectId: 1, entryDate: -1 });
+
+// Text index for AI retrieval and search
+entrySchema.index({ title: 'text', textContent: 'text' });
 
 const Entry = mongoose.model('Entry', entrySchema);
 export default Entry;
