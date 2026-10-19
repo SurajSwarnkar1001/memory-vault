@@ -501,11 +501,13 @@ export default function ProjectPage({ projectId, onNavigate }) {
           setIsEditModalOpen(false);
           setEditingEntry(null);
         }}
-        title="Edit Entry"
+        title={editingEntry?.title ? `Edit Entry: ${editingEntry.title}` : 'Edit Entry'}
+        maxWidth="max-w-4xl xl:max-w-5xl"
+        allowFullScreen={true}
       >
-        <form onSubmit={handleSaveEdit} className="space-y-4">
+        <form onSubmit={handleSaveEdit} className="space-y-5">
           <div>
-            <label htmlFor="edit-title" className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+            <label htmlFor="edit-title" className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
               Title
             </label>
             <input
@@ -513,30 +515,36 @@ export default function ProjectPage({ projectId, onNavigate }) {
               type="text"
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
-              className="block w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-900 placeholder-slate-400 sm:text-xs focus:outline-none focus:border-accent"
+              className="block w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-slate-900 placeholder-slate-400 text-sm font-medium focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
               placeholder="Title (Optional)"
             />
           </div>
 
           {editingEntry && ['text', 'link'].includes(editingEntry.type) && (
             <div>
-              <label htmlFor="edit-text" className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                Content
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="edit-text" className="block text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  {editingEntry.type === 'link' ? 'Link URL' : 'Content / Memory Notes'}
+                </label>
+                <span className="text-[11px] text-slate-400 font-medium">
+                  {editTextContent.length} characters • {editTextContent.trim() ? editTextContent.trim().split(/\s+/).length : 0} words
+                </span>
+              </div>
               <textarea
                 id="edit-text"
                 value={editTextContent}
                 onChange={(e) => setEditTextContent(e.target.value)}
-                rows={4}
+                rows={editingEntry.type === 'link' ? 3 : 11}
                 required
-                className="block w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-900 placeholder-slate-400 sm:text-xs focus:outline-none focus:border-accent resize-none"
+                className="block w-full rounded-lg border border-slate-200 p-3.5 text-slate-900 placeholder-slate-400 text-sm sm:text-base leading-relaxed focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent resize-y font-normal min-h-[220px]"
+                placeholder={editingEntry.type === 'link' ? 'Enter link URL...' : 'Write your memory, notes, or ideas here...'}
               />
             </div>
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="edit-tags" className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+              <label htmlFor="edit-tags" className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
                 Tags
               </label>
               <input
@@ -544,13 +552,13 @@ export default function ProjectPage({ projectId, onNavigate }) {
                 type="text"
                 value={editTagsInput}
                 onChange={(e) => setEditTagsInput(e.target.value)}
-                className="block w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-accent"
+                className="block w-full rounded-lg border border-slate-200 px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
                 placeholder="tags (comma-separated, e.g. review, deploy)"
               />
             </div>
 
             <div>
-              <label htmlFor="edit-date" className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+              <label htmlFor="edit-date" className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
                 Entry Date
               </label>
               <DatePicker
@@ -562,13 +570,13 @@ export default function ProjectPage({ projectId, onNavigate }) {
                 timeIntervals={15}
                 timeCaption="time"
                 dateFormat="yyyy-MM-dd HH:mm"
-                className="block w-full rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-accent cursor-pointer"
+                className="block w-full rounded-lg border border-slate-200 px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent cursor-pointer"
                 wrapperClassName="w-full"
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
             {!isOwner && (
               <span className="text-xs text-red-500 font-semibold mr-auto">
                 Only the owner can edit entries.
@@ -587,7 +595,7 @@ export default function ProjectPage({ projectId, onNavigate }) {
             {isOwner && (
               <button
                 type="submit"
-                className="px-4 py-2 bg-accent text-white rounded-lg text-sm hover:bg-accent-dark transition duration-150 cursor-pointer font-medium"
+                className="px-5 py-2 bg-accent text-white rounded-lg text-sm hover:bg-accent-dark transition duration-150 cursor-pointer font-medium shadow-sm"
               >
                 Save Changes
               </button>
